@@ -1,0 +1,30 @@
+Reference(s),Value,Footprint
+"C1, C6, C7, C9",100n,cap 0603
+C2,10u ,tant cap EIA-3216-10
+C3,10u,tant cap EIA-3216-10
+"C4, C5",15p,Cap 0603
+C8,1p,cap 0603
+C10,22p,cap 0603
+"C11, C16, C21, C22",DNF,cap 0603
+C12,10n,cap 0603
+C13,47p,cap 0603
+"C14, C18",2p7,cap 0603
+C15,6p8,cap 0603
+"C17, C20",33p,cap 0603
+C19,100p,cap 0603
+"D1, D2",RED LED,Led 0603
+J1,,Con 2x20 2.54mm vert
+L1,3n3,ind 0603
+"L2, L9, L10, L11, L12",33n,ind 0603
+L3,12n,ind 0603
+L4,3n6,ind 0603
+L5,9n,ind 0603
+L6,0R,ind 0603
+"L7, L8",100n,ind 0603
+R1,0R,res 0603
+R2,1k,res 0603
+"R9, R10",220R,res 0603
+U1,SX1272,QFN-28-1EP_6x6mm
+U2,L78L33_SOT89,SOT-89-3
+U3,PE4259,SC70-6
+Y1,32MHz,Crystal SMD_2016-4Pin_2.0x1.6mm

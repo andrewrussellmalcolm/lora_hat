@@ -1,0 +1,135 @@
+@D: 
+Beyond WiFi : control your devices over long distances with this low-cost Raspberry PI LoRa modem
+
+@Bi:
+
+@V:
+Some variants of the Raspberry Pi come equipped with WiFi, which make them suitable for wireless data gathering and control applications in certain circumstances. However, the range of WiFi is limited, and generally requires a WiFi enabled router etc. to issue ip addresses. Beyond WiFi, there are a number of standards for long range wireless communications in the 868MHz license-free band which are more suitable for embedded applications. One of these is LoRa[1], which is widely used and supported by several silicon implementations. The silicon itself is usually packaged onto module which are available for sale in the $20 region. These modules are often further mounted on standard PCBs and offered as development kits by the silicon manufacturers and others. Here, I will present a discussion of the application of LoRa to a Raspberry PI based data control system, culminating in the design of a low-cost HAT for the Pi with an integrated PCB antenna, which can be built for less that $10.
+
+
+@ZT: Introduction to LoRa
+The name LoRa is derived from “Long Range”, and long range is indeed one of the system’s defining characteristics. In fact there are groups that set out to demonstrate some extreme examples, one such group [2]  claiming 476 miles, using a transmit power of just 25mW. This brings me to another defining factor: low power. Because LoRa operates in a number of licence-free ISM*[3](USA) and [4](Europe) frequency bands, maximum power is limited by law. But low power is often also mandated by the need for battery operation, or dependance on solar energy at a remote location. So it is this combination of low power and long range which makes LoRa attractive for telemetry applications. Range figures like those mentioned earlier should of course be examined with a critical eye. They are typically achieved at high altitudes with line of sight between transmitter and receiver and other optimum conditions. However, in an urban environment, ranges of up to a mile are possible with low cost, compact hardware.      
+All this performance comes at a price of course, as in general the laws of physics limit range based on transmitted power, distance, signal-to-noise ratio at the receiver and bandwidth. The more bandwidth is used, the more data can be transmitted in a given time, and bandwidth is a limited resource. The licence free channel most used in the USA is the  915MHz band, with a bandwidth of 26MHz. This bandwidth is divided into channels, and a typical application might use 125 to 500KHz of that. LoRa uses spread-spectrum techniques to improve noise immunity, and as a result, those longest range setups using a 125kHz channel width may be limited to data rates of a few bits per second, once packet synchronization, channel usage limits, addressing and error detection are factored in. (Further information on LoRa modulation is available here [5]) These rates are no  good for streaming live audio, but perfect for background data gathering and control. After all, to control a relay state  you simply need to deliver one bit. Similarly, the water level in a reservoir, for example to an accuracy of 1% can easily be expressed in an 8 bit packet.  Some interesting application examples may be found here [6] 
+
+*ISM: Industrial, scientific & medical
+
+First practical steps with LoRa
+To get started with LoRa, I purchased a pair of complete modules manufactured by Semtech. This company holds patents on the LoRa standard, manufactures silicon, modules and complete development PCBs and accessories. The module I chose was the SX1272RF1BAS [7], which is available from many distributors. The module is equipped with a 16 pin and a 10 pin header. The radio chip is controlled over a 4-wire SPI [8] interface, which is supported by the Raspberry Pi  and so very easy to connect this module without recourse to a soldering iron! The downside is that the modules cost about 3 times the price of the Raspberry Pi. 
+
+@ZY: Connecting a Raspberry Pi to SEmtech's SX1272RF1BAS LoRa module
+@Bi: raspberry-pi-to-lora-module.png 
+
+@ZT: Semtech's module with antenna connected
+@Bi: semtech_module.png
+
+
+With two Raspberry Pis  connected to two modules, antennas connected and powered up, it’s time to fire up some software.  Martin Giess’s excellent SX1272 test suite [9] is a great place to start. Log onto each Pi in turn and run the following command:
+
+git clone https://github.com/mngiess/lora-sx1272-test.git
+
+Follow the excellent instructions from reference [9] (make sure you have the build relevant tools installed for your chosen distro - see the inset) and you should end up with a transmitter and receiver application on each Pi.  Run the transmitter on one, and the receiver on the other. If all goes well, you should see messages on the console of each Pi showing messages being sent by the transmitter, and acknowledged by the receiver. That’s it. You’re up and running with LoRa!     
+
+@ZT: Hardware design
+The next step was to create a plugin or HAT for the Raspberry Pi. An initial search of the distributors turned up modules with the SX1272 chip, an RF switch(for switching the antenna from RX to TX) and a few passive components, in the range $15 to $20. But the SX1272 and the antenna switch are available for <$5 and I needed to design a PCB anyway to interface to the Pi, so the module solution seemed overpriced. Certainly, it removes a lot of the uncertainty from the design of the RF part (from the chip to the antenna), but Semtech's web site is full of resources, including complete PCB layouts for many of their modules and a lot of technical discussion on good RF layout practice and antenna matching. On top of that, they provide a reference design for a PCB based antenna. This further reduces cost by removing the antenna itself along with connectors and cables. The resulting design has the antenna protruding over the HDMI connector on the Pi, and the RF circuitry itelf takes up less than half the HAT PCB area, leaving plenty of space for application-specific circuitry, such as relays or sensor interfaces. The current design simply has two LEDs, and I chose to have a local 3.3V power supply for the modem chip to try to avoid any digital noise from the Pi interfering with the RF signals. The design was implemented using KiCad[10], an excellent open-source Schematic capture and PCB design package that runs on Linux.  
+
+@ZT: The complete LoRa HAT schematic
+@Bi: lora_schematic.pdf
+
+The PCB layout is very straightforward, sticking as closely as possible to the RF layout from the SX1272 reference design[11], and the antenna reference design[12]  
+The one caveat is that the ground plane on the underside of the board forms an integral part of the antenna, so its a good idea not to pierce it with to many long tracks. See [xx] The resulting PCB can be assembled by hand in about half an hour.      
+
+
+@ZT: The completed design, as rendered by KiCad
+@Bi: lora_hat.png
+
+
+
+@ZT: 
+
+
+
+@KT: Listing2: the relay contol transmitter
+@LI: switch.cpp
+
+
+
+@KT: Listing2: the relay contol receiver
+@LI: relay.cpp
+
+
+
+
+
+
+
+
+
+
+
+
+@ZT:Conclusion
+The author hopes the instrument described here, and the details of how it was built, its function and how it works internally will prove of interest to readers. There is always scope for improvement, both in hardware and software. There are many other uses the dds HAT board could be put to, with different software. For example, it's possible to produce complex amplitude, phase and frequency modulation schemes, (there are some examples in the datasheets and associated application notes) and so it could be integrated into a communications system.   
+All the designs and code will be available at[20] 
+
+
+@KT: Antenna design
+
+@KT: Build tools for the test software
+
+
+@IT:References 
+@IL:
+1. LoRa Wiki page
+<U>https://en.wikipedia.org/wiki/LoRa<U>
+
+2. LoRa world distance record
+<U>https://www.thethingsnetwork.org/article/lorawan-distance-world-record<U>
+
+3. US 915MHz licence-free band
+<U>https://en.wikipedia.org/wiki/ISM_band<U>
+
+4. European 868MHz license free band  
+<U>https://en.wikipedia.org/wiki/Short-range_device#SRD860<U>
+
+5. LoRA modulation basics
+<U>https://www.semtech.com/uploads/documents/an1200.22.pdf<U>
+
+6. LoRa example deployments  
+<U>https://en.wikipedia.org/wiki/LoRa#Deployments_of_LoRa_Technology<U>
+
+7.Semtech's SX1272RF1BAS module
+<U>https://www.digikey.co.uk/product-detail/en/semtech-corporation/SX1272RF1BAS/SX1272RF1BAS-ND/4490407<U>
+
+8. The SPI iterfave wiki page 
+<U>https://en.wikipedia.org/wiki/Serial_Peripheral_Interface<U>
+
+9. LoRa test software for the Raspberry Pi 
+<U>https://github.com/mngiess/lora-sx1272-test/blob/master/README.md<U>
+
+10. KiCAD Cross-platform and open source electronics design automation suite
+<U>http://kicad-pcb.org/<U>
+
+11: SX1272 modules: SX1272RF1xAS - 868 or 915 MHz - Combined RFI and PA_BOOST design
+https://www.semtech.com/products/wireless-rf/lora-transceivers/sx1272
+
+12: Planar F-Antenna Reference Design
+https://www.semtech.com/uploads/documents/AN1200.20-SARANT_V1_0_STD.pdf
+
+20: Author's github project page 
+<U>https://github.com/andrewrussellmalcolm/lora_hat<U>
+
+https://arxiv.org/pdf/1607.08011.pdf (understanding limits)
+https://www.semtech.com/uploads/documents/an1200.22.pdf (modulation basics)
+https://www.semtech.com/uploads/documents/SX1272_DS_V4.pdf 
+
+@IL: Useful online tools
+https://www.loratools.nl/#/airtime
+
+@IL:Useful Youtube videos
+
+https://www.youtube.com/watch?v=C_Rh5GSENA4
+
+@IT: 
+@Bi: authour_pic.jpg
+Andrew Malcolm (MIEE, CEng) works as a software engineer for Guru Systems (https://www.gurusystems.com/), a fast-growing IoT hardware and SaaS company working on low carbon energy projects In the evenings and weekends he likes to combine software engineering with his first love, hardware engineering. With all the  opensource tools available, he is never short of things to design. The Raspberry PI has proved a source of inspiration and to date Andrew has designed 5 different add-ons, or HATs. He is currently working on mirco-stepping motor drives for a Pi-based laser cutting machine. He can contacted on andrewrussellmalcolm@gmail.com
+

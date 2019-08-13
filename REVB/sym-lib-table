@@ -1,0 +1,5 @@
+(sym_lib_table
+  (lib (name LoRa-hat)(type Legacy)(uri ${KIPRJMOD}/project_components/LoRa-hat.lib)(options "")(descr ""))
+  (lib (name Connector_Generic)(type Legacy)(uri /home/andrew/hardware/LoRa-hat/LoRa_article/Connector_Generic.lib)(options "")(descr ""))
+  (lib (name LoRa-hat-rescue)(type Legacy)(uri ${KIPRJMOD}/LoRa-hat-rescue.lib)(options "")(descr ""))
+)
